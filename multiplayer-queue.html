@@ -291,33 +291,42 @@
         
         // Initialize connection
         function connect() {
+            console.log('🔌 Attempting to connect to:', serverUrl);
             socket = io(serverUrl);
-            
+
             socket.on('connect', () => {
+                console.log('✅ Socket connected successfully');
                 updateConnectionStatus('connected', 'Connected');
+                console.log('📤 Sending joinQueue event');
                 socket.emit('joinQueue');
             });
-            
-            socket.on('disconnect', () => {
+
+            socket.on('disconnect', (reason) => {
+                console.log('❌ Socket disconnected, reason:', reason);
                 updateConnectionStatus('disconnected', 'Disconnected');
             });
-            
-            socket.on('connect_error', () => {
+
+            socket.on('connect_error', (error) => {
+                console.log('❌ Socket connection error:', error);
                 updateConnectionStatus('disconnected', 'Connection Failed');
             });
             
             socket.on('queueUpdate', (data) => {
+                console.log('📋 Received queueUpdate:', data);
                 playersInQueue = data.players || [];
                 updateQueueDisplay();
             });
-            
+
             socket.on('gameStarting', (data) => {
+                console.log('🎮 Game starting with data:', data);
                 // Redirect to game with assigned player ID and team
                 const gameUrl = `index (7).html?multiplayer=true&playerId=${data.playerId}&team=${data.team}&server=${encodeURIComponent(serverUrl)}`;
+                console.log('🔄 Redirecting to:', gameUrl);
                 window.location.href = gameUrl;
             });
-            
+
             socket.on('queueError', (data) => {
+                console.log('❌ Queue error:', data);
                 alert('Queue Error: ' + data.message);
             });
         }
@@ -359,7 +368,9 @@
         }
         
         leaveQueueBtn.addEventListener('click', () => {
+            console.log('👆 Leave Queue button clicked');
             if (socket) {
+                console.log('📤 Sending leaveQueue event');
                 socket.emit('leaveQueue');
                 socket.disconnect();
             }
