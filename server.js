@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
+const fs = require('fs');
 
 // Global error handling for production
 process.on('uncaughtException', (err) => {
@@ -30,7 +31,29 @@ const io = new Server(server, {
   }
 });
 
-// Serve static files
+// Special handling for HTML files to inject server URL (MUST come before static middleware)
+app.get(['/', '/index.html', '/multiplayer-queue.html'], (req, res) => {
+  const filePath = path.join(__dirname, req.path === '/' ? 'index.html' : req.path);
+
+  try {
+    // Read the HTML file
+    let html = fs.readFileSync(filePath, 'utf8');
+
+    // Inject server URL as a global variable
+    const serverUrl = process.env.SERVER_URL || 'http://localhost:3000';
+    const injectScript = `<script>window.SERVER_URL = "${serverUrl}";</script>`;
+
+    // Insert the script before the closing </head> tag
+    html = html.replace('</head>', `${injectScript}</head>`);
+
+    res.send(html);
+  } catch (error) {
+    console.error('Error serving HTML file:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+// Serve static files (must come after custom routes)
 app.use(express.static(__dirname));
 
 // Health check endpoint for Render
