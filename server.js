@@ -21,7 +21,7 @@ const server = http.createServer(app);
 // CORS configuration - secure for production
 const corsOrigins = process.env.NODE_ENV === 'production'
   ? [process.env.FRONTEND_URL || 'https://your-frontend-domain.vercel.app']
-  : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+  : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5500', 'http://127.0.0.1:5500'];
 
 const io = new Server(server, {
   cors: {

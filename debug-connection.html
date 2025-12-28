@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socket.IO Connection Debug</title>
+    <script src="config.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <h1>Socket.IO Connection Debug</h1>
+    <div id="status">Initializing...</div>
+    <div id="log"></div>
+
+    <script>
+        const statusEl = document.getElementById('status');
+        const logEl = document.getElementById('log');
+
+        function log(message) {
+            console.log(message);
+            logEl.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+        }
+
+        statusEl.textContent = 'Config loaded. SERVER_URL: ' + (window.SERVER_URL || 'undefined');
+        log('Config loaded. SERVER_URL: ' + (window.SERVER_URL || 'undefined'));
+        log('gameConfig.SERVER_URL: ' + (window.gameConfig ? window.gameConfig.SERVER_URL : 'undefined'));
+
+        const serverUrl = (window.gameConfig && window.gameConfig.SERVER_URL) || 'http://localhost:3000';
+        log('Using server URL: ' + serverUrl);
+
+        statusEl.textContent = 'Connecting to: ' + serverUrl;
+        const socket = io(serverUrl);
+
+        socket.on('connect', () => {
+            log('✅ Connected to server!');
+            statusEl.textContent = '✅ Connected to: ' + serverUrl;
+            statusEl.style.color = 'green';
+
+            // Try joining queue
+            log('Attempting to join queue...');
+            socket.emit('joinQueue');
+        });
+
+        socket.on('connect_error', (error) => {
+            log('❌ Connection error: ' + error.message);
+            statusEl.textContent = '❌ Connection failed: ' + error.message;
+            statusEl.style.color = 'red';
+        });
+
+        socket.on('disconnect', (reason) => {
+            log('❌ Disconnected: ' + reason);
+            statusEl.textContent = '❌ Disconnected: ' + reason;
+            statusEl.style.color = 'red';
+        });
+
+        socket.on('queueUpdate', (data) => {
+            log('📋 Queue update received: ' + JSON.stringify(data));
+        });
+
+        socket.on('queueError', (data) => {
+            log('❌ Queue error: ' + data.message);
+        });
+    </script>
+</body>
+</html>
