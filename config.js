@@ -1,10 +1,11 @@
 // Configuration for Farmer's Fright Multiplayer
 const config = {
-    // Default server URL - can be overridden by environment variable
-    SERVER_URL: process.env.SERVER_URL || 'http://localhost:3000',
-
-    // For production, set SERVER_URL environment variable
-    // Example: https://your-server-deployment-url.com
+    // Server URL - works for both server and client environments
+    SERVER_URL: (typeof process !== 'undefined' && process.env && process.env.SERVER_URL)
+        ? process.env.SERVER_URL
+        : (typeof window !== 'undefined' && window.SERVER_URL)
+        ? window.SERVER_URL
+        : 'http://localhost:3000'
 };
 
 // Make config available globally
