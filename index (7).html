@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple RTS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="scoreboard" style="position: absolute; top: 10px; left: 10px; z-index: 100; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 8px; min-width: 180px;"></div>
+    <main>
+        <canvas id="gameCanvas"></canvas>
+
+        <section id="minimap-container">
+            <canvas id="minimapCanvas"></canvas>
+        </section>
+
+        <div id="gameTimer">00:00</div>
+
+        <section id="resourceSupplyDisplay">
+            <div class="resourceDisplay">
+                <span class="label">Resources:</span>
+                <span id="resourceValue" class="resourceValue">0</span>
+            </div>
+            <div class="supplyDisplay">
+                <span class="label">Supply:</span>
+                <span id="supplyValue" class="supplyValue">0/10</span>
+            </div>
+        </section>
+
+        <section id="playerControls" class="hidden">
+            <div class="team-group">
+                <div class="team-label">Team 1</div>
+                <button id="player1Btn" class="playerBtn active team1">Player 1 (1)</button>
+                <button id="player2Btn" class="playerBtn team1">Player 2 (2)</button>
+            </div>
+
+            <div class="team-group">
+                <div class="team-label">Team 2</div>
+                <button id="player3Btn" class="playerBtn team2">Player 3 (3)</button>
+                <button id="player4Btn" class="playerBtn team2">Player 4 (4)</button>
+            </div>
+
+            <div class="team-group">
+                <div class="team-label">Team 3</div>
+                <button id="player5Btn" class="playerBtn team3">Player 5 (5)</button>
+                <button id="player6Btn" class="playerBtn team3">Player 6 (6)</button>
+            </div>
+
+            <div class="team-group">
+                <div class="team-label">Team 4</div>
+                <button id="player7Btn" class="playerBtn team4">Player 7 (7)</button>
+                <button id="player8Btn" class="playerBtn team4">Player 8 (8)</button>
+            </div>
+        </section>
+
+        <section id="performanceMonitor" class="hidden">
+            <div class="monitorLine">FPS: <span id="fpsCounter">0</span></div>
+            <div class="monitorLine">Frame Time: <span id="frameTime">0</span>ms</div>
+            <div class="monitorLine">Memory: <span id="memoryUsage">0</span>MB</div>
+        </section>
+
+        <!-- Chat Overlay -->
+        <section id="chatOverlay">
+            <div id="chatMessages"></div>
+            <div id="chatInputContainer" class="hidden">
+                <span id="chatPrefix">[All]</span>
+                <input type="text" id="chatInput" placeholder="Type your message..." maxlength="200">
+            </div>
+        </section>
+    </main>
+    <script src="config.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="ui-system.js"></script>
+    <script src="multiplayer-client.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

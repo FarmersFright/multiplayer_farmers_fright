@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer Queue - Farmer's Fright</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .queue-container {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            padding: 40px;
+            min-width: 500px;
+            max-width: 600px;
+            box-shadow: 0 0 30px rgba(52, 152, 219, 0.3);
+        }
+        
+        .queue-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .queue-header h1 {
+            font-size: 32px;
+            color: #3498db;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+        }
+        
+        .queue-header p {
+            color: #bbb;
+            font-size: 14px;
+        }
+        
+        .queue-status {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 5px;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+        
+        .queue-status h2 {
+            font-size: 24px;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .player-count {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2ecc71;
+            margin: 10px 0;
+        }
+        
+        .required-count {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        
+        .players-list {
+            margin: 30px 0;
+            min-height: 150px;
+        }
+        
+        .players-list h3 {
+            color: #3498db;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .player-item {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            border-radius: 5px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s;
+        }
+        
+        .player-item:hover {
+            background: rgba(52, 152, 219, 0.2);
+            border-color: rgba(52, 152, 219, 0.5);
+        }
+        
+        .player-name {
+            font-weight: bold;
+            color: #ecf0f1;
+        }
+        
+        .player-status {
+            color: #2ecc71;
+            font-size: 12px;
+        }
+        
+        .waiting-message {
+            text-align: center;
+            color: #f39c12;
+            font-size: 16px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(243, 156, 18, 0.1);
+            border-radius: 5px;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+        
+        .ready-message {
+            text-align: center;
+            color: #2ecc71;
+            font-size: 18px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 5px;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .queue-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2980b9, #1f6391);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(231, 76, 60, 0.8);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(231, 76, 60, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        
+        .connection-status.connected {
+            color: #2ecc71;
+            border: 1px solid #2ecc71;
+        }
+        
+        .connection-status.disconnected {
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+        
+        .connection-status.connecting {
+            color: #f39c12;
+            border: 1px solid #f39c12;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+            margin-right: 5px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .empty-queue {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 40px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status connecting" id="connectionStatus">
+        <span class="spinner"></span> Connecting...
+    </div>
+    
+    <div class="queue-container">
+        <div class="queue-header">
+            <h1>🎮 Multiplayer Queue</h1>
+            <p>Waiting for players to join...</p>
+        </div>
+        
+        <div class="queue-status">
+            <h2>Players in Queue</h2>
+            <div class="player-count" id="playerCount">0</div>
+            <div class="required-count">of 2 required to start</div>
+        </div>
+        
+        <div class="players-list">
+            <h3>Connected Players</h3>
+            <div id="playersList" class="empty-queue">
+                No players yet...
+            </div>
+        </div>
+        
+        <div id="statusMessage" class="waiting-message" style="display: none;">
+            Waiting for more players...
+        </div>
+        
+        <div class="queue-actions">
+            <button class="btn btn-secondary" id="leaveQueueBtn">Leave Queue</button>
+        </div>
+    </div>
+    
+    <script src="config.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket = null;
+        let playerId = null;
+        let playersInQueue = [];
+        
+        const connectionStatus = document.getElementById('connectionStatus');
+        const playerCountEl = document.getElementById('playerCount');
+        const playersListEl = document.getElementById('playersList');
+        const statusMessageEl = document.getElementById('statusMessage');
+        const leaveQueueBtn = document.getElementById('leaveQueueBtn');
+        
+        // Get server URL from query params or use config default
+        const urlParams = new URLSearchParams(window.location.search);
+        const defaultServerUrl = (window.gameConfig && window.gameConfig.SERVER_URL) || 'http://localhost:3000';
+        const serverUrl = urlParams.get('server') || defaultServerUrl;
+        
+        // Initialize connection
+        function connect() {
+            socket = io(serverUrl);
+            
+            socket.on('connect', () => {
+                updateConnectionStatus('connected', 'Connected');
+                socket.emit('joinQueue');
+            });
+            
+            socket.on('disconnect', () => {
+                updateConnectionStatus('disconnected', 'Disconnected');
+            });
+            
+            socket.on('connect_error', () => {
+                updateConnectionStatus('disconnected', 'Connection Failed');
+            });
+            
+            socket.on('queueUpdate', (data) => {
+                playersInQueue = data.players || [];
+                updateQueueDisplay();
+            });
+            
+            socket.on('gameStarting', (data) => {
+                // Redirect to game with assigned player ID and team
+                const gameUrl = `index (7).html?multiplayer=true&playerId=${data.playerId}&team=${data.team}&server=${encodeURIComponent(serverUrl)}`;
+                window.location.href = gameUrl;
+            });
+            
+            socket.on('queueError', (data) => {
+                alert('Queue Error: ' + data.message);
+            });
+        }
+        
+        function updateConnectionStatus(status, text) {
+            connectionStatus.className = `connection-status ${status}`;
+            connectionStatus.innerHTML = status === 'connecting' 
+                ? `<span class="spinner"></span> ${text}`
+                : text;
+        }
+        
+        function updateQueueDisplay() {
+            const count = playersInQueue.length;
+            playerCountEl.textContent = count;
+            
+            if (count === 0) {
+                playersListEl.innerHTML = '<div class="empty-queue">No players yet...</div>';
+                statusMessageEl.style.display = 'none';
+            } else {
+                playersListEl.innerHTML = playersInQueue.map((player, index) => {
+                    return `
+                        <div class="player-item">
+                            <span class="player-name">Player ${player.playerId || index + 1}</span>
+                            <span class="player-status">Ready</span>
+                        </div>
+                    `;
+                }).join('');
+                
+                if (count < 2) {
+                    statusMessageEl.className = 'waiting-message';
+                    statusMessageEl.textContent = `Waiting for ${2 - count} more player${2 - count > 1 ? 's' : ''}...`;
+                    statusMessageEl.style.display = 'block';
+                } else {
+                    statusMessageEl.className = 'ready-message';
+                    statusMessageEl.textContent = '✓ Ready to start! Game will begin shortly...';
+                    statusMessageEl.style.display = 'block';
+                }
+            }
+        }
+        
+        leaveQueueBtn.addEventListener('click', () => {
+            if (socket) {
+                socket.emit('leaveQueue');
+                socket.disconnect();
+            }
+            window.location.href = 'index.html';
+        });
+        
+        // Start connection
+        connect();
+    </script>
+</body>
+</html>
+

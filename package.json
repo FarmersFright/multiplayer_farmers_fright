@@ -1,0 +1,30 @@
+{
+  "name": "farmers-fright-multiplayer",
+  "version": "1.0.0",
+  "description": "Multiplayer game frontend for Farmer's Fright",
+  "main": "server.js",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'No build step required'",
+    "start": "node server.js",
+    "server": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1"
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "game",
+    "multiplayer",
+    "socket.io",
+    "real-time",
+    "strategy"
+  ]
+}
+

@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer's Fright</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: white;
+            overflow: hidden;
+            background-image: url('menupic5.png');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .menu-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            height: 80px;
+        }
+        
+        .game-logo {
+            font-size: 36px;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(139, 139, 139, 0.8);
+            font-family: 'Impact', sans-serif;
+            letter-spacing: 1px;
+        }
+        
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-welcome {
+            font-size: 16px;
+            color: #3498db;
+            display: none;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #2980b9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .main-content {
+            display: flex;
+            flex: 1;
+            height: calc(100% - 80px);
+        }
+        
+        .menu-buttons {
+            width: 300px;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 80%, transparent 100%);
+        }
+        
+        .menu-button {
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-left: 4px solid #3498db;
+            border-radius: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-size: 18px;
+            text-align: left;
+            transition: all 0.2s;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-button:hover {
+            background-color: rgba(52, 152, 219, 0.3);
+            transform: translateX(10px);
+            border-left: 4px solid #2ecc71;
+        }
+        
+        .menu-button:active {
+            background-color: rgba(52, 152, 219, 0.5);
+        }
+        
+        .primary-button {
+            background-color: rgba(46, 204, 113, 0.3);
+            border-left: 4px solid #2ecc71;
+            font-size: 20px;
+        }
+        
+        .primary-button:hover {
+            background-color: rgba(46, 204, 113, 0.5);
+            border-left: 4px solid #3498db;
+        }
+        
+        .feature-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 40px;
+        }
+        
+        .feature-info {
+            max-width: 500px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .feature-info h2 {
+            color: #3498db;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        
+        .feature-info p {
+            color: #ecf0f1;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        /* Loading spinner */
+        .loader {
+            display: none;
+            border: 5px solid rgba(52, 152, 219, 0.3);
+            border-radius: 50%;
+            border-top: 5px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Version info */
+        .version-info {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
+        
+        /* Social media links */
+        .social-links {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-icon {
+            width: 32px;
+            height: 32px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .social-icon:hover {
+            transform: scale(1.1);
+            background-color: rgba(0, 0, 0, 0.8);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .youtube-icon:hover {
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        
+        /* Background enhancement */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+            z-index: 1;
+        }
+        
+        /* Background slideshow (behind overlay) */
+        .bg-slideshow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .bg-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 1;
+            transition: opacity 1.5s ease-in-out;
+            will-change: opacity;
+        }
+        
+        .bg-slide.hidden {
+            opacity: 0;
+        }
+        
+        .menu-divider {
+            height: 1px;
+            background: linear-gradient(90deg, #3498db, transparent);
+            margin: 10px 0;
+            opacity: 0.5;
+        }
+        
+        .menu-section-title {
+            color: #3498db;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin: 20px 0 10px 10px;
+            letter-spacing: 1px;
+        }
+        
+        /* Game Mode Selection Screen */
+        .game-mode-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: none;
+            flex-direction: column;
+            z-index: 100;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .game-mode-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 1px solid #3498db;
+        }
+        
+        .game-mode-title {
+            font-size: 24px;
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: #3498db;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .close-btn:hover {
+            color: #2ecc71;
+            transform: scale(1.1);
+        }
+        
+        .game-mode-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+        
+        .game-mode-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .custom-lobby-option {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border: 2px solid #e74c3c;
+        }
+        
+        .custom-lobby-option:hover {
+            border-color: #f39c12;
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.3);
+        }
+        
+        .multiplayer-option {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border: 2px solid #3498db;
+        }
+        
+        .multiplayer-option:hover {
+            border-color: #2980b9;
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.3);
+        }
+        
+        .game-mode-option {
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .game-mode-option:hover {
+            border-color: #2ecc71;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+        
+        .game-mode-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: #3498db;
+        }
+        
+        .game-mode-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .game-mode-desc {
+            font-size: 14px;
+            color: #bbb;
+            line-height: 1.4;
+        }
+        
+        .vs-ai-option {
+            grid-column: span 2;
+            background-color: rgba(41, 128, 185, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-slideshow" aria-hidden="true">
+        <div class="bg-slide" id="bg1" style="background-image: url('menupic5.png');"></div>
+        <div class="bg-slide hidden" id="bg2" style="background-image: url('menupic9.png');"></div>
+    </div>
+    <div class="overlay"></div>
+    
+    <div class="menu-container">
+        <div class="game-header">
+            <div class="game-logo">FARMER'S FRIGHT</div>
+            <div class="user-section">
+                <div class="user-welcome" id="user-welcome">Welcome, <span id="username-display">Player</span></div>
+                <div class="user-avatar" id="user-avatar">P</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="menu-buttons">
+                <button id="play-button" class="menu-button primary-button">PLAY GAME</button>
+                
+                <div class="menu-section-title">REPLAYS & MEDIA</div>
+                <button id="replay-viewer-button" class="menu-button">Replay Viewer</button>
+                
+                <div class="menu-section-title">COMMUNITY</div>
+                <button id="clans-button" class="menu-button">Clans</button>
+                <button id="forums-button" class="menu-button">Forums</button>
+                <button id="patch-notes-button" class="menu-button">Patch Notes</button>
+                
+                <div class="menu-divider"></div>
+                
+                <div class="menu-section-title">OTHERS</div>
+                <button id="profile-button" class="menu-button" style="display: none;">My Profile</button>
+                <button id="friends-button" class="menu-button" style="display: none;">Friends</button>
+                <button id="settings-button" class="menu-button">Settings</button>
+                <button id="about-button" class="menu-button">About</button>
+                <button id="login-button" class="menu-button">Login / Register</button>
+                <button id="logout-button" class="menu-button" style="display: none;">Logout</button>
+            </div>
+            
+            <div class="feature-content">
+                <div class="feature-info">
+                    <h2>PATCH 1.0</h2>
+                    <p>Equip your bow, build your army, and conquer the battlefield. Compete against players worldwide in this intense real-time strategy game where skill and tactics determine victory.</p>
+                </div>
+            </div>
+
+            <!-- Global Chat Sidebar -->
+            <div id="global-chat" style="width: 360px; padding: 16px; background: rgba(0,0,0,0.65); border-left: 1px solid rgba(52,152,219,0.5); display:flex; flex-direction:column; gap:8px;">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div style="color:#3498db; font-weight:bold;">Global Chat</div>
+                    <div id="global-conn" style="font-size:12px; color:#7f8c8d;">…</div>
+                </div>
+                <div id="global-chat-messages" style="flex:1; min-height: 200px; max-height: calc(100vh - 220px); overflow:auto; background: rgba(0,0,0,0.4); border:1px solid rgba(52,152,219,0.3); border-radius:6px; padding:8px;"></div>
+                <div style="display:flex; gap:8px;">
+                    <input id="global-chat-input" type="text" placeholder="Type a message…" style="flex:1; padding:10px; border-radius:6px; border:1px solid rgba(52,152,219,0.4); background: rgba(0,0,0,0.5); color:#ecf0f1;">
+                    <button id="global-chat-send" class="menu-button" style="width:auto; padding:10px 14px; border-left: 4px solid #3498db;">Send</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="loader" id="game-loader"></div>
+    </div>
+    
+    <!-- Game Mode Selection Screen -->
+    <div class="game-mode-screen" id="game-mode-screen">
+        <div class="game-mode-header">
+            <div class="game-mode-title">SELECT GAME MODE</div>
+            <button class="close-btn" id="close-game-mode">&times;</button>
+        </div>
+        <div class="game-mode-content">
+            <div class="game-mode-options">
+                <div class="game-mode-option" data-mode="1v1">
+                    <div class="game-mode-icon">⚔️</div>
+                    <div class="game-mode-name">1v1</div>
+                    <div class="game-mode-desc">Challenge a single opponent in a test of skill and strategy.</div>
+                </div>
+                <div class="game-mode-option" data-mode="2v2">
+                    <div class="game-mode-icon">👥</div>
+                    <div class="game-mode-name">2v2</div>
+                    <div class="game-mode-desc">Team up with an ally to face off against two opponents.</div>
+                </div>
+                <div class="game-mode-option" data-mode="3v3">
+                    <div class="game-mode-icon">👥👤</div>
+                    <div class="game-mode-name">3v3</div>
+                    <div class="game-mode-desc">Join forces with two teammates in a medium-scale battle.</div>
+                </div>
+                <div class="game-mode-option" data-mode="4v4">
+                    <div class="game-mode-icon">👥👥</div>
+                    <div class="game-mode-name">4v4</div>
+                    <div class="game-mode-desc">Engage in large-scale warfare with three allies against four opponents.</div>
+                </div>
+                <div class="game-mode-option vs-ai-option" data-mode="ai">
+                    <div class="game-mode-icon">🤖</div>
+                    <div class="game-mode-name">Play Against AI</div>
+                    <div class="game-mode-desc">Practice your skills against computer-controlled opponents of varying difficulties.</div>
+                </div>
+                <div class="game-mode-option custom-lobby-option" data-mode="custom">
+                    <div class="game-mode-icon">⚙️</div>
+                    <div class="game-mode-name">Create Custom Lobby</div>
+                    <div class="game-mode-desc">Create a custom game with advanced settings, map selection, and player management.</div>
+                </div>
+                <div class="game-mode-option multiplayer-option" data-mode="multiplayer">
+                    <div class="game-mode-icon">🌐</div>
+                    <div class="game-mode-name">Multiplayer Game</div>
+                    <div class="game-mode-desc">Play against other players in real-time using WebRTC peer-to-peer connections.</div>
+                </div>
+                <div class="game-mode-option multiplayer-option" data-mode="queue" style="grid-column: span 2; background: linear-gradient(135deg, #2c3e50, #34495e); border: 2px solid #9b59b6;">
+                    <div class="game-mode-icon">⚡</div>
+                    <div class="game-mode-name">Quick Match Queue</div>
+                    <div class="game-mode-desc">Join the matchmaking queue. Game starts automatically when 2 players are ready. Teams are randomly assigned.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="version-info">v1.0.0</div>
+    
+    <!-- Social Media Links -->
+    <div class="social-links">
+        <a href="https://www.youtube.com/channel/UCiuLxqY7PtPxgEfzRsKHBNA" target="_blank" class="social-icon youtube-icon" title="Official YouTube Channel">
+            <img src="YoutubeLogo.png" alt="YouTube" style="width: 20px; height: 20px;">
+        </a>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Check user authentication status
+        function checkAuthStatus() {
+            const userWelcome = document.getElementById('user-welcome');
+            const userAvatar = document.getElementById('user-avatar');
+            const usernameDisplay = document.getElementById('username-display');
+            const loginButton = document.getElementById('login-button');
+            const logoutButton = document.getElementById('logout-button');
+            const profileButton = document.getElementById('profile-button');
+            const friendsButton = document.getElementById('friends-button');
+            
+            // Get current user from localStorage
+            const currentUser = JSON.parse(localStorage.getItem('bow_game_current_user'));
+            
+            if (currentUser && currentUser.loggedIn) {
+                // User is logged in
+                userWelcome.style.display = 'block';
+                userAvatar.style.display = 'flex';
+                userAvatar.textContent = currentUser.username.charAt(0).toUpperCase();
+                usernameDisplay.textContent = currentUser.username;
+                loginButton.style.display = 'none';
+                logoutButton.style.display = 'block';
+                profileButton.style.display = 'block';
+                friendsButton.style.display = 'block';
+            } else {
+                // No user logged in
+                userWelcome.style.display = 'none';
+                userAvatar.style.display = 'none';
+                loginButton.style.display = 'block';
+                logoutButton.style.display = 'none';
+                profileButton.style.display = 'none';
+                friendsButton.style.display = 'none';
+            }
+        }
+        
+        // Handle user logout
+        function handleLogout() {
+            localStorage.removeItem('bow_game_current_user');
+            checkAuthStatus();
+        }
+        
+        window.addEventListener('load', () => {
+            console.log("Window loaded");
+            
+            // Check user authentication status
+            checkAuthStatus();
+            
+            // Get UI elements
+            const playButton = document.getElementById('play-button');
+            const gameLoader = document.getElementById('game-loader');
+            
+            if (!playButton || !gameLoader) {
+                console.error("UI elements not found");
+                return;
+            }
+            
+            // Menu button event listeners
+            document.getElementById('play-button').addEventListener('click', function() {
+                console.log("Play button clicked");
+                
+                // Show game mode selection screen instead of loading animation
+                document.getElementById('game-mode-screen').style.display = 'flex';
+            });
+            
+            document.getElementById('replay-viewer-button').addEventListener('click', function() {
+                console.log("Replay Viewer button clicked");
+                
+                // Navigate to replay viewer page
+                window.location.href = 'replay-viewer.html';
+            });
+            
+            document.getElementById('patch-notes-button').addEventListener('click', function() {
+                console.log("Patch Notes button clicked");
+                
+                // Navigate to patch notes page
+                window.location.href = 'patch-notes.html';
+            });
+            
+            document.getElementById('forums-button').addEventListener('click', function() {
+                console.log("Forums button clicked");
+                
+                // Navigate to forums page
+                window.location.href = 'forums.html';
+            });
+            
+            document.getElementById('clans-button').addEventListener('click', function() {
+                console.log("Clans button clicked");
+                
+                // Navigate to clans page
+                window.location.href = 'clans.html';
+            });
+            
+            document.getElementById('profile-button').addEventListener('click', function() {
+                console.log("Profile button clicked");
+                
+                // Navigate to user profile page
+                window.location.href = 'user-profile.html';
+            });
+            
+            document.getElementById('friends-button').addEventListener('click', function() {
+                console.log("Friends button clicked");
+                
+                // Navigate to friends page
+                window.location.href = 'friends.html';
+            });
+            
+            document.getElementById('login-button').addEventListener('click', function() {
+                console.log("Login button clicked");
+                
+                // Navigate to login page
+                window.location.href = 'login.html';
+            });
+            
+            document.getElementById('logout-button').addEventListener('click', function() {
+                console.log("Logout button clicked");
+                
+                // Handle logout
+                handleLogout();
+            });
+            
+            // TODO: Implement these screens
+            document.getElementById('settings-button').addEventListener('click', function() {
+                console.log("Settings button clicked");
+                window.location.href = 'settings.html';
+            });
+            
+            document.getElementById('about-button').addEventListener('click', function() {
+                console.log("About button clicked");
+                window.location.href = 'about.html';
+            });
+            
+            // Close game mode selection
+            document.getElementById('close-game-mode').addEventListener('click', function() {
+                document.getElementById('game-mode-screen').style.display = 'none';
+            });
+            
+            // Game mode selection
+            const gameModeOptions = document.querySelectorAll('.game-mode-option');
+            gameModeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const mode = this.getAttribute('data-mode');
+                    console.log(`Selected game mode: ${mode}`);
+                    
+                    // Hide game mode screen
+                    document.getElementById('game-mode-screen').style.display = 'none';
+                    
+                    if (mode === 'custom') {
+                        // Redirect to Node.js multiplayer lobby
+                        window.location.href = '/multiplayer';
+                    } else if (mode === 'multiplayer') {
+                        // Redirect to Node.js multiplayer lobby (Socket.IO)
+                        window.location.href = '/multiplayer';
+                    } else if (mode === 'queue') {
+                        // Redirect to multiplayer queue
+                        window.location.href = 'multiplayer-queue.html';
+                    } else {
+                        // Show loading animation
+                        playButton.style.display = 'none';
+                        gameLoader.style.display = 'block';
+                        
+                        // Short delay to allow loading animation to be seen
+                        setTimeout(() => {
+                            // Redirect to game page with mode parameter
+                            window.location.href = `index (7).html?mode=${mode}`;
+                        }, 800);
+                    }
+                });
+            });
+
+            // Background slideshow rotation
+            const slideshowImages = ['menupic5.png', 'menupic12.png', 'MenuPic7.png'];
+            let slideshowIndex = 0;
+            const bgSlide1 = document.getElementById('bg1');
+            const bgSlide2 = document.getElementById('bg2');
+            let isFirstVisible = true;
+
+            // Preload images
+            slideshowImages.forEach(src => { const img = new Image(); img.src = src; });
+
+            function advanceSlideshow() {
+                console.log('[Slideshow] advancing... current index:', slideshowIndex);
+                const nextIndex = (slideshowIndex + 1) % slideshowImages.length;
+                const nextUrl = `url('${slideshowImages[nextIndex]}')`;
+                const visibleEl = isFirstVisible ? bgSlide1 : bgSlide2;
+                const hiddenEl = isFirstVisible ? bgSlide2 : bgSlide1;
+
+                hiddenEl.style.backgroundImage = nextUrl;
+                hiddenEl.classList.remove('hidden');
+                visibleEl.classList.add('hidden');
+
+                isFirstVisible = !isFirstVisible;
+                slideshowIndex = nextIndex;
+
+                // Fallback: also update body background in case slides are not visible
+                document.body.style.backgroundImage = nextUrl;
+            }
+
+            console.log('[Slideshow] starting with images:', slideshowImages);
+            // Kick off immediately so it's visible without waiting
+            advanceSlideshow();
+            setInterval(advanceSlideshow, 10000);
+
+            // --- Global Chat Wiring ---
+            const chat = {
+                socket: null,
+                messagesEl: document.getElementById('global-chat-messages'),
+                inputEl: document.getElementById('global-chat-input'),
+                sendBtn: document.getElementById('global-chat-send'),
+                connEl: document.getElementById('global-conn'),
+                username: null
+            };
+
+            function initGlobalChat() {
+                const currentUser = JSON.parse(localStorage.getItem('bow_game_current_user'));
+                chat.username = (currentUser && currentUser.loggedIn && currentUser.username) ? currentUser.username : null;
+                chat.socket = io();
+
+                chat.socket.on('connect', () => { 
+                    if (chat.connEl) chat.connEl.textContent = 'Connected';
+                    // Register user with server for friends/clans system
+                    if (chat.username) {
+                        chat.socket.emit('registerUser', chat.username);
+                    }
+                });
+                chat.socket.on('disconnect', () => { if (chat.connEl) chat.connEl.textContent = 'Disconnected'; });
+
+                chat.socket.on('globalChatHistory', (history) => {
+                    if (!Array.isArray(history)) return;
+                    history.forEach(msg => appendGlobalMessage(msg.playerName, msg.message, msg.timestamp));
+                    scrollChatToBottom();
+                });
+
+                chat.socket.on('globalChatMessage', (data) => {
+                    appendGlobalMessage(data.playerName, data.message, data.timestamp);
+                    scrollChatToBottom();
+                });
+
+                function send() {
+                    const message = (chat.inputEl.value || '').trim();
+                    if (!message) return;
+                    const playerName = chat.username || 'Guest';
+                    chat.socket.emit('globalChatMessage', { playerName, message });
+                    chat.inputEl.value = '';
+                }
+                chat.sendBtn.addEventListener('click', send);
+                chat.inputEl.addEventListener('keypress', (e) => { if (e.key === 'Enter') send(); });
+            }
+
+            function appendGlobalMessage(playerName, message, ts) {
+                const el = document.createElement('div');
+                el.style.padding = '6px 4px';
+                el.style.borderBottom = '1px solid rgba(52,152,219,0.15)';
+                const time = ts ? new Date(ts).toLocaleTimeString() : '';
+                el.innerHTML = `<span style="color:#7f8c8d; font-size:11px; margin-right:6px;">${time}</span><strong style="color:#3498db;">${escapeHtml(playerName)}:</strong> <span style="color:#ecf0f1;">${escapeHtml(message)}</span>`;
+                chat.messagesEl.appendChild(el);
+            }
+
+            function scrollChatToBottom() {
+                chat.messagesEl.scrollTop = chat.messagesEl.scrollHeight;
+            }
+
+            function escapeHtml(str) {
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            // Initialize global chat after UI is ready
+            initGlobalChat();
+        });
+    </script>
+</body>
+</html> 
